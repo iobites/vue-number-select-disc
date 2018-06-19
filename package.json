@@ -1,8 +1,8 @@
 {
   "name": "vue-number-select-disc",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Number selection with draggable disc",
-  "main": "dist/number-select-disc.js",
+  "main": "dist/vue-number-select-disc.js",
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --config ./webpack.config.js --mode=production",
     "lint": "eslint ./src --fix",
