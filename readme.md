@@ -4,7 +4,7 @@
 
 This component is in an early development state.  
 
--> [Demo](https://iobites.github.io/vue-number-select-disc)
+-> [Demo](https://iobites.github.io/vue-number-select-disc/)
 
 ## Install
 
