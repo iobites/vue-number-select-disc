@@ -60,15 +60,17 @@
               <!-- stroke="url(#colorGradient)" -->
               <!-- stroke-width="5" /> -->
 
-      <circle class="inner-circle"
+      <circle :class="innerCircleClasses"
               :style="innerCircleStyle"
               :cx="centerX"
               :cy="centerY"
               :r="innerCircleRadius"
+              @touchstart="numberSelected"
               @click="numberSelected" />
 
       <text :x="textPosX"
             :y="centerY + 5"
+            v-if="showText"
             class="svg-text"
             @click="numberSelected">
             {{formatedNumber}} {{unit}}
@@ -83,18 +85,22 @@
 <style lang="stylus">
 
   .inner-circle
-    fill: limegreen
+    fill: #CF0100
     filter: url(#insetShadow)
 
   .inner-circle:hover
-    fill: chartreuse !important
+    fill: #f70502 !important
 
   .inner-circle:active
     filter: url(#insetShadow)
-    fill: brown !important
+    fill: #32c229 !important
+
+  .inner-circle-disabled
+    fill: blue
+    filter: url(#insetShadow)
 
   .outer-circle
-    fill: limegreen
+    fill: #2C3D51
     filter: url(#dropshadow)
     filter: brightness(85%)
 
@@ -138,6 +144,18 @@ export default {
       type: Number,
       default: 1
     },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    signed: {
+      type: Boolean,
+      default: false
+    },
+    showText: {
+      type: Boolean,
+      default: true
+    },
     floating: {
       type: Boolean,
       default: true
@@ -157,11 +175,11 @@ export default {
     },
     innerColor: {
       type: String,
-      default: 'limegreen'
+      default: '#CF0100'
     },
     outerColor: {
       type: String,
-      default: 'darkred'
+      default: '#2C3D51'
     },
     unit: {
       type: String,
@@ -185,6 +203,13 @@ export default {
   },
 
   computed: {
+    innerCircleClasses: function () {
+      return {
+        'inner-circle': !this.disabled,
+        'inner-circle-disabled': this.disabled
+      }
+    },
+
     textPosX () {
       let factor = 15
       if (this.currentNumber >= 100) {
@@ -302,41 +327,47 @@ export default {
     },
 
     updateCurrentNumber (x, y) {
-        const rect = this.$refs.svgElem.getBoundingClientRect()
-        const centerX = rect.left + this.width / 2
-        const centerY = rect.top + this.height / 2
+      if (this.disabled) {
+        return
+      }
+      const rect = this.$refs.svgElem.getBoundingClientRect()
+      const centerX = rect.left + this.width / 2
+      const centerY = rect.top + this.height / 2
 
-        let dy = y - centerY
-        const dx = x - centerX
+      let dy = y - centerY
+      const dx = x - centerX
 
-        // Invert Y-axis
-        // dy *= -1
+      // Invert Y-axis
+      // dy *= -1
 
-        let theta = 0
-        if (dx == 0) {
-          if (dy > 0) {
-            theta = 90
-          } else {
-            theta = 270
-          }
+      let theta = 0
+      if (dx == 0) {
+        if (dy > 0) {
+          theta = 90
         } else {
-          theta = Math.atan2(dy, dx); // range (-PI, PI]
-          theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
-          if (theta < 0) {
-            theta = 360 + theta; // range [0, 360)
-          }
+          theta = 270
         }
-
-        this.currentAngle = Math.floor(theta)
-        const precision = this.precision - 1
-        if (lastAngle < this.currentAngle - precision) {
-          this.currentNumber += this.stepWidth
-          lastAngle = this.currentAngle
-        } else if (lastAngle > this.currentAngle + precision) {
-          this.currentNumber -= this.stepWidth
-          lastAngle = this.currentAngle
+      } else {
+        theta = Math.atan2(dy, dx);
+        theta *= 180 / Math.PI;
+        if (theta < 0) {
+          theta = 360 + theta;
         }
+      }
 
+      this.currentAngle = Math.floor(theta)
+      const precision = this.precision - 1
+      if (lastAngle < this.currentAngle - precision) {
+        this.currentNumber += this.stepWidth
+        lastAngle = this.currentAngle
+      } else if (lastAngle > this.currentAngle + precision) {
+        this.currentNumber -= this.stepWidth
+        lastAngle = this.currentAngle
+      }
+      // Check boundaries
+      if (!this.signed && this.currentNumber < 0) {
+        this.currentNumber = 0
+      }
     },
 
     handleMouseMove (evnt) {
@@ -344,7 +375,9 @@ export default {
     },
 
     numberSelected () {
-      this.$emit('selected', this.formatedNumber)
+      if (!this.disabled) {
+        this.$emit('selected', this.formatedNumber)
+      }
     },
 
     toDegrees (angle) {
