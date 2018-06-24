@@ -27,18 +27,37 @@ Vue.use(VueNumberSelectDisc)
 ## Usage
 
 ```Javascript
-<vue-number-select-disc v-model="currentNumber"
-                          @selected="numberSelected"
-                          class="number-disc"
-                          width="200"
-                          height="200"
-                          floating
-                          :stepWidth="0.1"
-                          :fraction="2"
-                          :precision="10"
-                          :strokeWidth="50"
-                          :unit="cm" />
+<vue-number-select-disc v-model="myValue" />
 ```                          
+
+### Available attributes
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| width | [Number, String] | 200 | Component width |
+| height | [Number, String] | 200 |  Component height |
+| v-model | [Number, String] | 0 | Value binding |
+| min | Number | 0 | Allowed min value |
+| max | Number | 10000 | Allowed max value |
+| precision | Number | 1 | Adjust how amount of degree needed to inc or dec the value |
+| disabled | Boolean | false | Component will be inert |
+| signed | Boolean | false | Is the number signed or unsigned |
+| showText | Boolean | true | Whether to show the value and unit |
+| floating | Boolean | true | Floating point numbers |
+| fraction | Number | 0 > x < 5 | Number fraction to show |
+| stepWidth | Number | 1 | Amount to inc or dec the value |
+| strokeWidth | Number | 20 | Outer circle width |
+| unit | String | '' | Unit will be appended to the value text |
+| innerColor | String | #CF0100 | Overwrite inner cirlce fill color |
+| outerColor | String | #2C3D51 | Overwrite outer cirlce fill color |
+
+
+
+### Available events
+
+| Name | Description |
+| --- | --- |
+| selected | Will be triggered when a new number was selected |
+
 
 ## License
 

@@ -140,6 +140,14 @@ export default {
       type: [Number, String],
       default: 0
     },
+    min: {
+      type: [Number, String],
+      default: 0
+    },
+    max: {
+      type: [Number, String],
+      default: 10000
+    },
     precision: {
       type: Number,
       default: 1
@@ -211,14 +219,19 @@ export default {
     },
 
     textPosX () {
-      let factor = 15
-      if (this.currentNumber >= 100) {
-        factor = 25
+      const factor = 7
+      let numberStr = `${this.formatedNumber}`
+      if (this.unit !== '') {
+        numberStr += ' ' + this.unit
       }
-      if (this.currentNumber >= 1000) {
-        factor = 30
+
+      const wordSpace = numberStr.length * factor
+      let offset = (this.innerCircleRadius * 2 - wordSpace) / 2
+      if (offset < 0) {
+        offset = 0
       }
-      return this.centerX - factor
+
+      return this.centerX - this.innerCircleRadius + offset
     },
 
     formatedNumber () {
@@ -357,17 +370,26 @@ export default {
 
       this.currentAngle = Math.floor(theta)
       const precision = this.precision - 1
+      let nextNumber = this.currentNumber
+      const min = this.min * 1 // Implicit conversion
+      const max = this.max * 1 // Implicit conversion
       if (lastAngle < this.currentAngle - precision) {
-        this.currentNumber += this.stepWidth
+        nextNumber += this.stepWidth
         lastAngle = this.currentAngle
       } else if (lastAngle > this.currentAngle + precision) {
-        this.currentNumber -= this.stepWidth
+        nextNumber -= this.stepWidth
         lastAngle = this.currentAngle
       }
       // Check boundaries
-      if (!this.signed && this.currentNumber < 0) {
-        this.currentNumber = 0
+      if (!this.signed && nextNumber < 0) {
+        nextNumber = 0
+      } else if (nextNumber < min) {
+        nextNumber = min
+      } else if (nextNumber > max) {
+        nextNumber = max
       }
+
+      this.currentNumber = nextNumber
     },
 
     handleMouseMove (evnt) {
