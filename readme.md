@@ -47,8 +47,6 @@ Vue.use(VueNumberSelectDisc)
 | stepWidth | Number | 1 | Amount to inc or dec the value |
 | strokeWidth | Number | 20 | Outer circle width |
 | unit | String | '' | Unit will be appended to the value text |
-| innerColor | String | #CF0100 | Overwrite inner cirlce fill color |
-| outerColor | String | #2C3D51 | Overwrite outer cirlce fill color |
 
 
 

@@ -1,6 +1,6 @@
 <template>
 
-  <svg class="number-disc" :width="width" :height="height" xmlns="http://www.w3.org/2000/svg">
+  <svg class="io-number-disc" :width="width" :height="height" xmlns="http://www.w3.org/2000/svg">
 
     <defs>
 
@@ -50,28 +50,24 @@
 
     <g ref="svgElem">
 
-      <circle class="outer-circle"
-              :style="outerCircleStyle"
+      <circle :class="outerCircleClasses"
               :cx="centerX"
               :cy="centerY"
               :r="radius"
               @mousedown="mouseDown($event)"
               @touchstart="handleStart($event)" />
-              <!-- stroke="url(#colorGradient)" -->
-              <!-- stroke-width="5" /> -->
 
       <circle :class="innerCircleClasses"
-              :style="innerCircleStyle"
               :cx="centerX"
               :cy="centerY"
               :r="innerCircleRadius"
               @touchstart="numberSelected"
               @click="numberSelected" />
 
-      <text :x="textPosX"
+      <text :class="textClasses"
+            :x="textPosX"
             :y="centerY + 5"
             v-if="showText"
-            class="svg-text"
             @click="numberSelected">
             {{formatedNumber}} {{unit}}
       </text>
@@ -84,27 +80,39 @@
 
 <style lang="stylus">
 
-  .inner-circle
+  .iob-inner-circle
     fill: #CF0100
     filter: url(#insetShadow)
 
-  .inner-circle:hover
-    fill: #f70502 !important
+  .iob-inner-circle:hover
+    fill: #f70502
 
-  .inner-circle:active
+  .iob-inner-circle:active
     filter: url(#insetShadow)
-    fill: #32c229 !important
+    fill: #32c229
 
-  .inner-circle-disabled
-    fill: blue
+  .iob-inner-circle-disabled
+    fill: #eee;
+    opacity: 0.5;
     filter: url(#insetShadow)
 
-  .outer-circle
+  .iob-outer-circle
     fill: #2C3D51
     filter: url(#dropshadow)
     filter: brightness(85%)
 
-  .svg-text
+  .iob-outer-circle:hover
+    fill: #2C3D51
+
+  .iob-outer-circle:active
+    fill: #2C3D51
+
+  .iob-outer-circle-disabled
+    fill: #2C3D51
+    filter: url(#dropshadow)
+    filter: brightness(85%)
+
+  .iob-svg-text
     -webkit-touch-callout: none /* iOS Safari */
     -webkit-user-select: none /* Safari */
     -khtml-user-select: none /* Konqueror HTML */
@@ -112,6 +120,9 @@
     -ms-user-select: none /* Internet Explorer/Edge */
     user-select: none /* Non-prefixed version, currently supported by Chrome and Opera */
     pointer-events: none
+
+  .iob-svg-text-disabled
+    fill: #444
 
 </style>
 
@@ -213,8 +224,22 @@ export default {
   computed: {
     innerCircleClasses: function () {
       return {
-        'inner-circle': !this.disabled,
-        'inner-circle-disabled': this.disabled
+        'iob-inner-circle': !this.disabled,
+        'iob-inner-circle-disabled': this.disabled
+      }
+    },
+
+    outerCircleClasses: function () {
+      return {
+        'iob-outer-circle': !this.disabled,
+        'iob-outer-circle-disabled': this.disabled
+      }
+    },
+
+    textClasses: function () {
+      return {
+        'iob-svg-text': !this.disabled,
+        'iob-svg-text-disabled': this.disabled
       }
     },
 
@@ -244,17 +269,6 @@ export default {
 
     innerCircleRadius () {
       return this.radius - this.strokeWidth
-    },
-
-    innerCircleStyle () {
-      return { fill: this.innerColor }
-    },
-
-    outerCircleStyle () {
-      return {
-        fill: this.outerColor,
-        filter: 'url(#dropshadow)',
-      }
     },
 
     outerCircleTransform () {
