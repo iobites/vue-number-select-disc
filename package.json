@@ -1,6 +1,6 @@
 {
   "name": "vue-number-select-disc",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Number selection with draggable disc",
   "main": "dist/vue-number-select-disc.js",
   "scripts": {
