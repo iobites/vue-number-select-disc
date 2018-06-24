@@ -42,6 +42,7 @@ Vue.use(VueNumberSelectDisc)
 | disabled | Boolean | false | Component will be inert |
 | signed | Boolean | false | Is the number signed or unsigned |
 | showText | Boolean | true | Whether to show the value and unit |
+| showHandle | Boolean | false | Show a handle to indicate rotation |
 | floating | Boolean | true | Floating point numbers |
 | fraction | Number | 0 > x < 5 | Number fraction to show |
 | stepWidth | Number | 1 | Amount to inc or dec the value |

@@ -54,8 +54,10 @@
               :cx="centerX"
               :cy="centerY"
               :r="radius"
+              :transform="rotateAroundCenter"
               @mousedown="mouseDown($event)"
               @touchstart="handleStart($event)" />
+              <!-- fill="url(#colorGradient)" -->
 
       <circle :class="innerCircleClasses"
               :cx="centerX"
@@ -71,6 +73,15 @@
             @click="numberSelected">
             {{formatedNumber}} {{unit}}
       </text>
+
+      <circle :class="handleClasses"
+              :cx="handlePosX"
+              :cy="centerY"
+              :r="handleRadius"
+              :transform="rotateAroundCenter"
+              v-if="showHandle"
+              @mousedown="mouseDown($event)"
+              @touchstart="handleStart($event)" />
 
     </g>
 
@@ -124,6 +135,21 @@
   .iob-svg-text-disabled
     fill: #444
 
+  .iob-handle
+    fill: #CF0100
+    filter: url(#insetShadow)
+
+  .iob-handle:hover
+    fill: #f70502
+
+  .iob-handle:active
+    filter: url(#insetShadow)
+    fill: #32c229
+
+  .iob-handle-disabled
+    fill: #eee;
+    opacity: 0.5;
+
 </style>
 
 <script>
@@ -175,6 +201,10 @@ export default {
       type: Boolean,
       default: true
     },
+    showHandle: {
+      type: Boolean,
+      default: false
+    },
     floating: {
       type: Boolean,
       default: true
@@ -211,11 +241,20 @@ export default {
       radius: (this.width / 2 - 5),
       currentNumber: 0,
       currentAngle: 0,
+      centerX: Math.floor(this.width/2),
+      centerY: Math.floor(this.height/2),
+      absCenterX: 0,
+      absCenterY: 0,
     }
   },
 
   mounted () {
     this.currentNumber = this.value
+
+    const rect = this.$refs.svgElem.getBoundingClientRect()
+    this.absCenterX = rect.left + this.width / 2
+    this.absCenterY = rect.top + this.height / 2
+
     this.$refs.svgElem.addEventListener('mouseup',  this.removeMouseMoveListener)
     this.$refs.svgElem.addEventListener('touchend',  this.handleEnd)
     this.$refs.svgElem.addEventListener('touchcancel',  this.handleCancel)
@@ -243,6 +282,13 @@ export default {
       }
     },
 
+    handleClasses: function () {
+      return {
+        'iob-handle': !this.disabled,
+        'iob-handle-disabled': this.disabled
+      }
+    },
+
     textPosX () {
       const factor = 7
       let numberStr = `${this.formatedNumber}`
@@ -259,6 +305,10 @@ export default {
       return this.centerX - this.innerCircleRadius + offset
     },
 
+    handlePosX () {
+      return this.centerX + this.innerCircleRadius + this.handleRadius
+    },
+
     formatedNumber () {
       if (this.floating) {
         return this.currentNumber.toFixed(this.fraction)
@@ -271,16 +321,12 @@ export default {
       return this.radius - this.strokeWidth
     },
 
-    outerCircleTransform () {
-      return `rotate(${this.currentAngle})`
+    handleRadius () {
+      return Math.floor(this.strokeWidth / 2)
     },
 
-    centerX () {
-      return Math.floor(this.width/2)
-    },
-
-    centerY () {
-      return Math.floor(this.height/2)
+    rotateAroundCenter () {
+      return `rotate(${this.currentAngle},${this.centerX},${this.centerY})`
     },
 
     centerPoint () {
@@ -357,12 +403,9 @@ export default {
       if (this.disabled) {
         return
       }
-      const rect = this.$refs.svgElem.getBoundingClientRect()
-      const centerX = rect.left + this.width / 2
-      const centerY = rect.top + this.height / 2
 
-      let dy = y - centerY
-      const dx = x - centerX
+      let dy = y - this.absCenterY
+      const dx = x - this.absCenterX
 
       // Invert Y-axis
       // dy *= -1
