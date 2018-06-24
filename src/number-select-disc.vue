@@ -54,9 +54,9 @@
               :cx="centerX"
               :cy="centerY"
               :r="radius"
-              :transform="rotateAroundCenter"
               @mousedown="mouseDown($event)"
               @touchstart="handleStart($event)" />
+              <!-- :transform="rotateAroundCenter" -->
               <!-- fill="url(#colorGradient)" -->
 
       <circle :class="innerCircleClasses"
@@ -250,11 +250,6 @@ export default {
 
   mounted () {
     this.currentNumber = this.value
-
-    const rect = this.$refs.svgElem.getBoundingClientRect()
-    this.absCenterX = rect.left + this.width / 2
-    this.absCenterY = rect.top + this.height / 2
-
     this.$refs.svgElem.addEventListener('mouseup',  this.removeMouseMoveListener)
     this.$refs.svgElem.addEventListener('touchend',  this.handleEnd)
     this.$refs.svgElem.addEventListener('touchcancel',  this.handleCancel)
@@ -403,6 +398,10 @@ export default {
       if (this.disabled) {
         return
       }
+
+      const rect = this.$refs.svgElem.getBoundingClientRect()
+      this.absCenterX = rect.left + this.width / 2
+      this.absCenterY = rect.top + this.height / 2
 
       let dy = y - this.absCenterY
       const dx = x - this.absCenterX
